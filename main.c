@@ -69,7 +69,7 @@ unlockTrophy(int userId, int trophyId)
 		return -1;
 	}
 
-	// Init NpUniversalDataSystem - NP_UNIVERSAL_DATA_SYSTEM_INITIALIZE (?)
+	// Init NpUniversalDataSystem - NP_UNIVERSAL_DATA_SYSTEM_INITIALIZE
 	SceNpUniversalDataSystemInitParam param;
 	memset(&param, 0, sizeof(param));
 	param.size = sizeof(param);
@@ -118,7 +118,7 @@ unlockTrophy(int userId, int trophyId)
 		perror("sceNpUniversalDataSystemEventPropertyObjectSetInt32");
         goto error;
     }
-    unlockEvent = sceNpUniversalDataSystemPostEvent(unlockContextReg, unlockHandle, _event, 0); // NP_UNIVERSAL_DATA_SYSTEM_POST_EVENT (?)
+    unlockEvent = sceNpUniversalDataSystemPostEvent(unlockContextReg, unlockHandle, _event, 0); // NP_UNIVERSAL_DATA_SYSTEM_POST_EVENT
     if (unlockEvent < 0) {
 		perror("sceNpUniversalDataSystemPostEvent");
         goto error;
@@ -166,7 +166,7 @@ main(int argc, char *argv[]) {
 		int parsedTrophyID = parse_int(argv[1], &trophyID); // ID can be found in tropconf/tropmeta
 
 		// Notify about unlocking
-		printf_notification("TEST: Unlocking trophy ID %d", parsedTrophyID); // -lSceNpTrophy2 import & the tropy_model class could be used to get information about the trophy to be unlocked.
+		printf_notification("TEST: Unlocking trophy ID %d", parsedTrophyID);
 
 		// Unlock
 		ret = unlockTrophy(parsedUserID, parsedTrophyID);
