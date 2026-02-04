@@ -1,5 +1,21 @@
 #include "main.h"
 
+int
+parse_int(const char *s, int *out) {
+    char *end;
+    errno = 0;
+    long v = strtol(s, &end, 10);
+
+    if (end == s) {
+        return 1;
+    }
+    if (errno == ERANGE || v < INT_MIN || v > INT_MAX) {
+        return 2;
+    }
+    *out = (int)v;
+    return 0;
+}
+
 void
 printf_notification(const char *fmt, ...)
 {
@@ -99,21 +115,34 @@ error:
 }
 
 int
-main() {
-	// Notify about unlocking
-	printf_notification("TEST: Unlocking trophy ID 0003 (A Masterpiece)"); // -lSceNpTrophy2 import & the tropy_model class could be used to get information about the trophy to be unlocked.
+main(int argc, char *argv[]) {
+	if(argc == 1)
+	{
+		printf_notification("User or Trophy ID is missing.");
+		return -1;
+	}
+	else if(argc >= 2)
+	{
+		int ret;
+		int trophyID, userID;
 
-	int ret;
-	int trophyID = 3; // ID from tropconf/tropmeta
-	int userID = 0; // user_id from notification2.db (?)
+		// Parse *argv[] to int values
+		int parsedUserID = parse_int(argv[1], &userID); // user_id from notification2.db (? not sure)
+		int parsedTrophyID = parse_int(argv[0], &trophyID); // ID can be found in tropconf/tropmeta
 
-	// Unlock
-	ret = unlockTrophy(userID, trophyID);
-	if(ret < 0) {
-        return -1;
-    }
+		// Notify about unlocking
+		printf_notification("TEST: Unlocking trophy ID %d", parsedTrophyID); // -lSceNpTrophy2 import & the tropy_model class could be used to get information about the trophy to be unlocked.
 
-	// Notify when done
-	printf_notification("Unlocking succeeded.");
+		// Unlock
+		ret = unlockTrophy(parsedUserID, parsedTrophyID);
+		if(ret < 0) {
+			return -1;
+		}
+
+		// Notify when done
+		printf_notification("Unlocking succeeded.");
+
+	}
+
 	return 0;
 }
