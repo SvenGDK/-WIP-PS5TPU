@@ -1,5 +1,6 @@
 # [WIP] PS5TrophyUnlocker
-Work in progress for a PS5 Trophy unlocker.
+Work in progress for a PS5 Trophy unlocker.</br>
+Goal: While in game, send the payload with user & trophy id to unlock it.
 
 - Requires [ps5-payload-sdk](https://github.com/ps5-payload-dev/sdk/tree/master)
 - Add libSceNpUniversalDataSystem.sprx stub
