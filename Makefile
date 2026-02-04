@@ -6,7 +6,7 @@ endif
 
 ELF := trophyunlocker.elf
 
-CFLAGS := -Wall -Werror -g -lSceNpUniversalDataSystem
+CFLAGS := -Wall -Werror -g -lSceNpUniversalDataSystem -lSceSysmodule
 
 all: $(ELF)
 

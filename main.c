@@ -1,6 +1,28 @@
 #include "main.h"
 
 int
+loadNpUniversalDataSystemLib()
+{
+	int ret;
+	ret = sceSysmoduleLoadModule(0x0105); // NP_UNIVERSAL_DATA_SYSTEM
+	if (ret < 0) {
+		return ret;
+	}
+	return 0;
+}
+
+int
+unloadNpUniversalDataSystemLib()
+{
+	int ret;
+	ret = sceSysmoduleUnloadModule(0x0105);
+	if (ret < 0) {
+		return ret;
+	}
+	return 0;
+}
+
+int
 parse_int(const char *s, int *out) {
     char *end;
     errno = 0;
@@ -38,6 +60,14 @@ printf_notification(const char *fmt, ...)
 int
 unlockTrophy(int userId, int trophyId)
 {
+	// Load NpUniversalDataSystemLib
+	int loadRet;
+	loadRet = loadNpUniversalDataSystemLib();
+	if (loadRet < 0) {
+		perror("loadNpUniversalDataSystemLib");
+		return -1;
+	}
+
 	// Init NpUniversalDataSystem
 	SceNpUniversalDataSystemInitParam param;
 	param.size = sizeof(param);
@@ -105,6 +135,14 @@ unlockTrophy(int userId, int trophyId)
 		return -1;
 	}
 
+	// Unload NpUniversalDataSystemLib
+	int unloadRet;
+	unloadRet = unloadNpUniversalDataSystemLib();
+	if (unloadRet < 0) {
+		perror("unloadNpUniversalDataSystemLib");
+		return -1;
+	}
+
     return 0;
 
 error:
@@ -127,8 +165,8 @@ main(int argc, char *argv[]) {
 		int trophyID, userID;
 
 		// Parse *argv[] to int values
-		int parsedUserID = parse_int(argv[1], &userID); // user_id from notification2.db (? not sure)
-		int parsedTrophyID = parse_int(argv[0], &trophyID); // ID can be found in tropconf/tropmeta
+		int parsedUserID = parse_int(argv[0], &userID); // user_id from notification2.db (? not sure)
+		int parsedTrophyID = parse_int(argv[1], &trophyID); // ID can be found in tropconf/tropmeta
 
 		// Notify about unlocking
 		printf_notification("TEST: Unlocking trophy ID %d", parsedTrophyID); // -lSceNpTrophy2 import & the tropy_model class could be used to get information about the trophy to be unlocked.

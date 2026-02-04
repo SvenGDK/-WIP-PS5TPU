@@ -29,6 +29,14 @@ typedef struct {
 
 int sceKernelSendNotificationRequest(int device, SceNotificationRequest *req, size_t size, int blocking);
 
+void printf_notification(const char *fmt, ...);
+
+int sceSysmoduleLoadModule(uint16_t id);
+int sceSysmoduleUnloadModule(uint16_t id);
+
+int loadNpUniversalDataSystemLib();
+int unloadNpUniversalDataSystemLib();
+
 typedef struct SceNpUniversalDataSystemInitParam {
 	size_t size;
 	size_t poolSize;
