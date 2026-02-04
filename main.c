@@ -1,10 +1,11 @@
 #include "main.h"
+#include "10_01.h"
 
 int
 loadNpUniversalDataSystemLib()
 {
 	int ret;
-	ret = sceSysmoduleLoadModule(0x0105); // NP_UNIVERSAL_DATA_SYSTEM
+	ret = sceSysmoduleLoadModule(SYSMODULE_NP_UNIVERSAL_DATA_SYSTEM); // Not sure if NP_SYSMODULE_LOAD_MODULE (dumped offset) or general SYSMODULE_NP_UNIVERSAL_DATA_SYSTEM
 	if (ret < 0) {
 		return ret;
 	}
@@ -15,7 +16,7 @@ int
 unloadNpUniversalDataSystemLib()
 {
 	int ret;
-	ret = sceSysmoduleUnloadModule(0x0105);
+	ret = sceSysmoduleUnloadModule(SYSMODULE_NP_UNIVERSAL_DATA_SYSTEM); // Same as above
 	if (ret < 0) {
 		return ret;
 	}
@@ -68,8 +69,9 @@ unlockTrophy(int userId, int trophyId)
 		return -1;
 	}
 
-	// Init NpUniversalDataSystem
+	// Init NpUniversalDataSystem - NP_UNIVERSAL_DATA_SYSTEM_INITIALIZE (?)
 	SceNpUniversalDataSystemInitParam param;
+	memset(&param, 0, sizeof(param));
 	param.size = sizeof(param);
 	param.poolSize = 16 * 1024;
 	if(sceNpUniversalDataSystemInitialize(&param) < 0) {
@@ -79,16 +81,16 @@ unlockTrophy(int userId, int trophyId)
 
     // Create handle & context
 	int unlockHandle;
-	SceNpUniversalDataSystemHandle contextHandle = -1;
-	unlockHandle = sceNpUniversalDataSystemCreateHandle(&contextHandle);
+	SceNpUniversalDataSystemHandle contextHandle = NP_UNIVERSAL_DATA_SYSTEM_INVALID_CONTEXT;
+	unlockHandle = sceNpUniversalDataSystemCreateHandle(&contextHandle); // NP_UNIVERSAL_DATA_SYSTEM_CREATE_HANDLE
 	if (unlockHandle < 0) {
 		perror("sceNpUniversalDataSystemCreateHandle");
 		return -1;
 	}
 
 	int newUnlockContext;
-	SceNpUniversalDataSystemContext unlockContext = -1;
-	newUnlockContext = sceNpUniversalDataSystemCreateContext(&unlockContext, userId, 0, 0);
+	SceNpUniversalDataSystemContext unlockContext = NP_UNIVERSAL_DATA_SYSTEM_INVALID_HANDLE;
+	newUnlockContext = sceNpUniversalDataSystemCreateContext(&unlockContext, userId, 0, 0); // NP_UNIVERSAL_DATA_SYSTEM_CREATE_CONTEXT
 	if (newUnlockContext < 0) {
 		perror("sceNpUniversalDataSystemCreateContext");
 		return -1;
@@ -96,7 +98,7 @@ unlockTrophy(int userId, int trophyId)
 
 	// Register context
 	int unlockContextReg;
-	unlockContextReg = sceNpUniversalDataSystemRegisterContext(newUnlockContext, unlockHandle, 0);
+	unlockContextReg = sceNpUniversalDataSystemRegisterContext(newUnlockContext, unlockHandle, 0); // NP_UNIVERSAL_DATA_SYSTEM_REGISTER_CONTEXT
 	if (unlockContextReg < 0) {
 		perror("sceNpUniversalDataSystemRegisterContext");
 		return -1;
@@ -106,30 +108,30 @@ unlockTrophy(int userId, int trophyId)
     int unlockEvent;
     SceNpUniversalDataSystemEvent *_event = NULL;
     SceNpUniversalDataSystemEventPropertyObject *_prop = NULL;
-    unlockEvent = sceNpUniversalDataSystemCreateEvent("_UnlockTrophy", NULL, &_event, &_prop);
+    unlockEvent = sceNpUniversalDataSystemCreateEvent("_UnlockTrophy", NULL, &_event, &_prop); // NP_UNIVERSAL_DATA_SYSTEM_CREATE_EVENT
     if(unlockEvent < 0) {
 		perror("sceNpUniversalDataSystemCreateEvent");
         goto error;
     }
-    unlockEvent = sceNpUniversalDataSystemEventPropertyObjectSetInt32(_prop, "_trophy_id", trophyId);
+    unlockEvent = sceNpUniversalDataSystemEventPropertyObjectSetInt32(_prop, "_trophy_id", trophyId); // NP_UNIVERSAL_DATA_SYSTEM_EVENT_PROPERTY_OBJECT_SET_INT32
     if(unlockEvent < 0) {
 		perror("sceNpUniversalDataSystemEventPropertyObjectSetInt32");
         goto error;
     }
-    unlockEvent = sceNpUniversalDataSystemPostEvent(unlockContextReg, unlockHandle, _event, 0);
+    unlockEvent = sceNpUniversalDataSystemPostEvent(unlockContextReg, unlockHandle, _event, 0); // NP_UNIVERSAL_DATA_SYSTEM_POST_EVENT (?)
     if (unlockEvent < 0) {
 		perror("sceNpUniversalDataSystemPostEvent");
         goto error;
     }
 
 	// Destroy handle, context & unlock event
-    sceNpUniversalDataSystemDestroyHandle(unlockHandle);
-    sceNpUniversalDataSystemDestroyContext(unlockContextReg);
-    sceNpUniversalDataSystemDestroyEvent(_event);
+    sceNpUniversalDataSystemDestroyHandle(unlockHandle); // NP_UNIVERSAL_DATA_SYSTEM_DESTROY_HANDLE
+    sceNpUniversalDataSystemDestroyContext(unlockContextReg); // NP_UNIVERSAL_DATA_SYSTEM_DESTROY_CONTEXT
+    sceNpUniversalDataSystemDestroyEvent(_event); // NP_UNIVERSAL_DATA_SYSTEM_DESTROY_EVENT
 
 	// Terminate NpUniversalDataSystem
 	int terminateReturn;
-	terminateReturn = sceNpUniversalDataSystemTerminate();
+	terminateReturn = sceNpUniversalDataSystemTerminate(); // NP_UNIVERSAL_DATA_SYSTEM_TERMINATE
 	if (terminateReturn < 0) {
 		perror("sceNpUniversalDataSystemTerminate");
 		return -1;
@@ -154,12 +156,7 @@ error:
 
 int
 main(int argc, char *argv[]) {
-	if(argc == 1)
-	{
-		printf_notification("User or Trophy ID is missing.");
-		return -1;
-	}
-	else if(argc >= 2)
+	if(argc == 2)
 	{
 		int ret;
 		int trophyID, userID;
@@ -179,8 +176,11 @@ main(int argc, char *argv[]) {
 
 		// Notify when done
 		printf_notification("Unlocking succeeded.");
-
+		return 0;
 	}
-
-	return 0;
+	else
+	{
+		printf_notification("User or Trophy ID is missing.");
+		return -1;
+	}
 }

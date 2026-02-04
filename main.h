@@ -8,6 +8,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define SYSMODULE_NP_UNIVERSAL_DATA_SYSTEM			0x0105 // Firmware variable (NP_SYSMODULE_LOAD_MODULE & NP_SYSMODULE_UNLOAD_MODULE) or fixed ?
+#define NP_UNIVERSAL_DATA_SYSTEM_INVALID_CONTEXT		(-1)
+#define NP_UNIVERSAL_DATA_SYSTEM_INVALID_HANDLE			(-1)
+
 /* Full PS5 notification struct */
 typedef struct {
     int type;                //0x00
