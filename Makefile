@@ -4,14 +4,15 @@ else
     $(error PS5_PAYLOAD_SDK is undefined)
 endif
 
-ELF := trophyunlocker.elf
+ELF := ps5-trophy-unlocker.elf
 
-CFLAGS := -Wall -Werror -g -lSceNpUniversalDataSystem -lSceSysmodule
+CFLAGS := -Wall -Werror -g -O2 -Iinclude -lSceNpUniversalDataSystem -lSceSysmodule
 
 all: $(ELF)
 
-$(ELF): main.c
+$(ELF): source/main.c
 	$(CC) $(CFLAGS) -o $@ $^
+	strip $@
 
 clean:
 	rm -f $(ELF)
