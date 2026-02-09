@@ -4,15 +4,30 @@ else
     $(error PS5_PAYLOAD_SDK is undefined)
 endif
 
-ELF := ps5-trophy-unlocker.elf
+TARGET := ps5_trophy_unlocker.elf
 
-CFLAGS := -Wall -Werror -g -O2 -Iinclude -lSceNpUniversalDataSystem -lSceSysmodule
+SOURCES := main.c
+OBJECTS := $(SOURCES:.c=.o)
 
-all: $(ELF)
+CFLAGS := -Wall -O2
 
-$(ELF): source/main.c
-	$(CC) $(CFLAGS) -o $@ $^
-	strip $@
+LDFLAGS := -lkernel \
+           -lSceUserService \
+           -lSceSysmodule \
+           -lSceNpUniversalDataSystem
+
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(ELF)
+	rm -f $(OBJECTS) $(TARGET)
+
+test:
+	$(PS5_PAYLOAD_SDK)/host/send-payload.sh $(TARGET) $(PS5_HOST) $(PS5_PORT)
+
+.PHONY: all clean test

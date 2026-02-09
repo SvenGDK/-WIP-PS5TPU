@@ -3,7 +3,6 @@ Work in progress for a PS5 Trophy unlocker.</br>
 Goal: While in game, send the payload with user & trophy id to unlock it.
 
 ### To-Do / Ideas
-- Use SceUserService to remove the user id requirement (improvement)
 - Use SceNpTrophy2 to show full information in notification about the trophy to be unlocked (optional)
 
 ## Building
